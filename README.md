@@ -2,7 +2,7 @@
 
 内容团队提交素材、渠道与硬性时间。Agent 核对授权、检查已有排期并保存本地草稿；发生冲突时，可查找替代时段并请求确认。没有发布入口。
 
-**验收状态：离线六场景已运行；真实 DeepSeek 两条轨迹待配置并执行。** 现有 `examples/mock/` 是真实执行的离线 Mock 记录，不能证明真实模型决策。协议适配测试也不访问模型。
+**验收状态：离线六场景通过，DeepSeek Flash 两条真实轨迹通过。** [真实运行汇总](examples/live/summary.json)记录同一请求在空闲与冲突场景的结果。`examples/mock/` 是离线 Mock 记录；协议适配测试也不访问模型。
 
 ## 快速运行
 
@@ -46,7 +46,7 @@ npm run demo -- --mode live
 
 | 检查项 | 文件 |
 |---|---|
-| 六项验收和 Mock 轨迹 | [评估文档](docs/03-evaluation.md) · [离线场景汇总](examples/mock/summary.json) |
+| 六项验收与真实模型轨迹 | [评估文档](docs/03-evaluation.md) · [真实场景汇总](examples/live/summary.json) · [离线场景汇总](examples/mock/summary.json) |
 | 自动测试 | [测试用例](tests/agent.test.ts) · [实际执行记录](examples/test-results.txt) |
 | 业务范围和结构 | [需求](docs/01-requirements.md) · [设计](docs/02-solution.md) |
 | AI 辅助和下一步 | [AI 使用](docs/04-ai-usage.md) · [复盘](docs/05-retrospective.md) |

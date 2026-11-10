@@ -13,4 +13,11 @@
 
 自动测试另覆盖：授权绕过、过期的时段查询、伪造候选或回执、预算耗尽、模型断开时保存结果保留、部分成功、时区规范化和工具协议。协议测试使用注入的 HTTP 响应，未向远端发送请求。
 
-真实模型验收：当前没有本机可用密钥，未运行。配置后执行 `npm run demo -- --mode live`；空闲轨迹要求模型在看到可用后才请求保存，冲突轨迹要求模型看到占用后才查候选。两者都核对最终数据库行数。若模型跳过补查、输出格式错误或工具调用失败，保留失败记录并说明，不能用 Mock 补位。
+2026-11-10 使用 DeepSeek 官方 API（`deepseek-flash`，关闭深度思考），在 Node.js v26.13.0 下执行 `npm run demo -- --mode live`。两条场景均通过脚本断言，见[实际汇总](../examples/live/summary.json)。两次使用相同请求和各自全新的 SQLite 库，只改变 18:00 的占用。
+
+| 场景 | 实际模型行为 | 数据库证据 |
+|---|---|---|
+| 空闲 | 第 3 轮看到 18:00 可用，第 4 轮调用保存，结果为已保存。[Trace](../examples/live/available.trace.jsonl) · [输出](../examples/live/available.output.json) | [一条草稿](../examples/live/available.db.json) |
+| 冲突 | 第 3 轮看到 18:00 被占用，第 4 轮查替代时段。第 5 轮尝试保存 19:00，被工具以 `CONFIRMATION_REQUIRED` 拒绝；最终建议 19:00 并等待确认，原始要求仍为 18:00。[Trace](../examples/live/conflict.trace.jsonl) · [输出](../examples/live/conflict.output.json) | [零条草稿](../examples/live/conflict.db.json) |
+
+冲突用例通过是因为模型确实根据新观察补查，且业务约束阻止了未授权写入。模型发出了本可避免的保存调用，这仍是决策质量上的不足；`saveStatus: not_attempted` 表示没有进入数据库写入，不代表模型没有请求保存。样本量为每个场景一次，不能据此推断长期稳定性。

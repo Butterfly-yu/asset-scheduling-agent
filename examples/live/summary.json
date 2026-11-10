@@ -1,0 +1,18 @@
+{
+  "mode": "live",
+  "node": "v26.13.0",
+  "cases": [
+    {
+      "case": "available",
+      "pass": true,
+      "status": "saved",
+      "draftCount": 1
+    },
+    {
+      "case": "conflict",
+      "pass": true,
+      "status": "pending_confirmation",
+      "draftCount": 0
+    }
+  ]
+}

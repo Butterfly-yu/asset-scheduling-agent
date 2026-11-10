@@ -1,0 +1,25 @@
+{
+  "requestId": "pair-001",
+  "mode": "live",
+  "model": "deepseek-flash",
+  "status": "completed",
+  "items": [
+    {
+      "assetId": "M01",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "saved",
+      "reason": null,
+      "reviewStatus": "pass",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [],
+      "scheduleStatus": "scheduled",
+      "suggestedTime": "2026-12-01T18:00:00+08:00",
+      "needsConfirmation": false,
+      "saveStatus": "saved",
+      "draftId": "e1e0397d-706e-483b-8b45-34c134191127"
+    }
+  ],
+  "trace": "examples/live/available.trace.jsonl"
+}
