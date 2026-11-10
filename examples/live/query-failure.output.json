@@ -1,0 +1,37 @@
+{
+  "requestId": "pair-001",
+  "mode": "live",
+  "model": "deepseek-flash",
+  "status": "incomplete",
+  "items": [
+    {
+      "assetId": "M01",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "incomplete",
+      "reason": "SLOT_QUERY_FAILED",
+      "stopReason": null,
+      "nextStep": "排期查询失败，请检查数据库后重跑；不要根据本次结果安排发布。",
+      "reviewStatus": "pass",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [],
+      "scheduleStatus": "unresolved",
+      "requestedSlotStatus": "error",
+      "suggestedTime": null,
+      "alternatives": [],
+      "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [
+        {
+          "tool": "query_slots",
+          "code": "SLOT_QUERY_FAILED",
+          "scope": "requested"
+        }
+      ],
+      "saveStatus": "not_attempted",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/live/query-failure.trace.jsonl"
+}

@@ -1,0 +1,31 @@
+{
+  "requestId": "pair-001",
+  "mode": "mock",
+  "model": "deterministic-mock",
+  "status": "incomplete",
+  "items": [
+    {
+      "assetId": "M01",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "incomplete",
+      "reason": "NO_ALTERNATIVE_SLOT",
+      "stopReason": null,
+      "nextStep": "当前备选窗口没有空位，请提供其他可接受的发布时间。",
+      "reviewStatus": "pass",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [],
+      "scheduleStatus": "conflict",
+      "requestedSlotStatus": "occupied",
+      "suggestedTime": null,
+      "alternatives": [],
+      "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [],
+      "saveStatus": "not_attempted",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/mock/no-alternative.trace.jsonl"
+}

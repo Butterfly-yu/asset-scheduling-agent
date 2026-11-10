@@ -1,0 +1,2 @@
+{"assetId":"M02","mode":"live","step":1,"turn":1,"action":"get_asset","args":{},"result":{"code":"FOUND","assetId":"M02","metadata":{"title":"用户故事","channels":["short-video"]}},"basis":"已读取素材，可以核对规则","nextAction":"check_rules","requestId":"missing-001","model":"deepseek-flash"}
+{"assetId":"M02","mode":"live","step":2,"turn":2,"action":"check_rules","args":{},"result":{"code":"MISSING_INFO","status":"missing_info","missing":["licensed"],"risks":[],"version":"2026-11-10.1"},"basis":"工具给出缺失字段","nextAction":"finish:needs_info","requestId":"missing-001","model":"deepseek-flash"}

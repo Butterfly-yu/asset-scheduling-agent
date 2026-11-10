@@ -1,0 +1,31 @@
+{
+  "requestId": "pair-001",
+  "mode": "live",
+  "model": "deepseek-flash",
+  "status": "incomplete",
+  "items": [
+    {
+      "assetId": "M01",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "incomplete",
+      "reason": "WRITE_FAILED",
+      "stopReason": null,
+      "nextStep": "草稿未提交；修复存储故障后用同一请求重试。",
+      "reviewStatus": "pass",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [],
+      "scheduleStatus": "unresolved",
+      "requestedSlotStatus": "available",
+      "suggestedTime": null,
+      "alternatives": [],
+      "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [],
+      "saveStatus": "failed",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/live/write-failure.trace.jsonl"
+}

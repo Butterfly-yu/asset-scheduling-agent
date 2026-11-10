@@ -2,87 +2,153 @@ TAP version 13
 # Subtest: 同一请求：空闲时保存；仅改变占用后模型补查并等待确认
 ok 1 - 同一请求：空闲时保存；仅改变占用后模型补查并等待确认
   ---
-  duration_ms: 11.8699
+  duration_ms: 22.9418
   type: 'test'
   ...
 # Subtest: 资料缺失、未知素材和授权风险分别有可验证证据
 ok 2 - 资料缺失、未知素材和授权风险分别有可验证证据
   ---
-  duration_ms: 2.194
+  duration_ms: 3.8423
   type: 'test'
   ...
 # Subtest: 不同进程生命周期的连接重放同一草稿；相同 ID 更换请求被拒绝
 ok 3 - 不同进程生命周期的连接重放同一草稿；相同 ID 更换请求被拒绝
   ---
-  duration_ms: 38.1381
+  duration_ms: 86.6899
   type: 'test'
   ...
 # Subtest: 提交前保存错误回滚；同 ID 修复后可以重试
 ok 4 - 提交前保存错误回滚；同 ID 修复后可以重试
   ---
-  duration_ms: 1.6671
+  duration_ms: 3.3811
   type: 'test'
   ...
 # Subtest: 模型尝试改期、自行声明授权或绕过审核均无法写入
 ok 5 - 模型尝试改期、自行声明授权或绕过审核均无法写入
   ---
-  duration_ms: 1.2459
+  duration_ms: 2.2792
   type: 'test'
   ...
 # Subtest: 查询后插入占用，事务复查阻止过期观察造成的冲突
 ok 6 - 查询后插入占用，事务复查阻止过期观察造成的冲突
   ---
-  duration_ms: 1.2311
+  duration_ms: 2.0579
   type: 'test'
   ...
 # Subtest: 不接受未经查询的备选时间或模型自行声称已保存
 ok 7 - 不接受未经查询的备选时间或模型自行声称已保存
   ---
-  duration_ms: 2.0059
+  duration_ms: 3.6176
   type: 'test'
   ...
 # Subtest: 同一模型回合批量请求也无法突破工具预算
 ok 8 - 同一模型回合批量请求也无法突破工具预算
   ---
-  duration_ms: 1.3077
+  duration_ms: 2.3522
   type: 'test'
   ...
 # Subtest: 已提交草稿保留，即使模型在下一回合断开
 ok 9 - 已提交草稿保留，即使模型在下一回合断开
   ---
-  duration_ms: 1.2683
+  duration_ms: 3.2457
   type: 'test'
   ...
 # Subtest: 批内同渠道同时段只保存一项；不吞掉已成功的结果
 ok 10 - 批内同渠道同时段只保存一项；不吞掉已成功的结果
   ---
-  duration_ms: 1.3854
+  duration_ms: 4.2836
   type: 'test'
   ...
 # Subtest: 时间验证排除缺少偏移量及不存在的日期
 ok 11 - 时间验证排除缺少偏移量及不存在的日期
   ---
-  duration_ms: 0.3131
+  duration_ms: 0.8891
   type: 'test'
   ...
 # Subtest: DeepSeek 适配器按协议回传 tool_call_id 和工具结果；此测试不访问真实模型
 ok 12 - DeepSeek 适配器按协议回传 tool_call_id 和工具结果；此测试不访问真实模型
   ---
-  duration_ms: 30.1767
+  duration_ms: 60.1851
   type: 'test'
   ...
 # Subtest: 模型错误不能凭空变成业务成功；配置和报错不回显密钥
 ok 13 - 模型错误不能凭空变成业务成功；配置和报错不回显密钥
   ---
-  duration_ms: 2.1689
+  duration_ms: 3.2265
   type: 'test'
   ...
-1..13
-# tests 13
+# Subtest: 排期查询失败进入最终结果；无时段写入、可重试
+ok 14 - 排期查询失败进入最终结果；无时段写入、可重试
+  ---
+  duration_ms: 22.8431
+  type: 'test'
+  ...
+# Subtest: 写入失败后模型格式错误不会遮掉已知的保存失败
+ok 15 - 写入失败后模型格式错误不会遮掉已知的保存失败
+  ---
+  duration_ms: 2.5098
+  type: 'test'
+  ...
+# Subtest: 冲突后不向模型提供保存工具，模型伪造调用也被运行层拒绝
+ok 16 - 冲突后不向模型提供保存工具，模型伪造调用也被运行层拒绝
+  ---
+  duration_ms: 3.2357
+  type: 'test'
+  ...
+# Subtest: 同一模型回合不能在读取素材前夹带未授权的工具
+ok 17 - 同一模型回合不能在读取素材前夹带未授权的工具
+  ---
+  duration_ms: 1.8354
+  type: 'test'
+  ...
+# Subtest: 候选跟随实际占用；搜索范围无候选时明确返回原因
+ok 18 - 候选跟随实际占用；搜索范围无候选时明确返回原因
+  ---
+  duration_ms: 5.627
+  type: 'test'
+  ...
+# Subtest: 跨连接确认及重放：原始时段保留，确认同一提案只保存一次
+ok 19 - 跨连接确认及重放：原始时段保留，确认同一提案只保存一次
+  ---
+  duration_ms: 126.5505
+  type: 'test'
+  ...
+# Subtest: 确认时重新检查占用，已被抢占的提案不写入；重查可生成新提案
+ok 20 - 确认时重新检查占用，已被抢占的提案不写入；重查可生成新提案
+  ---
+  duration_ms: 6.1125
+  type: 'test'
+  ...
+# Subtest: 确认时重新检查素材规则，风险或缺资料均阻止写入
+ok 21 - 确认时重新检查素材规则，风险或缺资料均阻止写入
+  ---
+  duration_ms: 3.2506
+  type: 'test'
+  ...
+# Subtest: 确认写入失败回滚且可重试；不存在的提案返回明确原因
+ok 22 - 确认写入失败回滚且可重试；不存在的提案返回明确原因
+  ---
+  duration_ms: 2.6371
+  type: 'test'
+  ...
+# Subtest: 自定义数据拒绝错误类型和缺失的硬性授权规则
+ok 23 - 自定义数据拒绝错误类型和缺失的硬性授权规则
+  ---
+  duration_ms: 0.7788
+  type: 'test'
+  ...
+# Subtest: 同一回合预先夹带备选查询不会跳过模型观察
+ok 24 - 同一回合预先夹带备选查询不会跳过模型观察
+  ---
+  duration_ms: 3.1301
+  type: 'test'
+  ...
+1..24
+# tests 24
 # suites 0
-# pass 13
+# pass 24
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 298.9342
+# duration_ms 593.6313

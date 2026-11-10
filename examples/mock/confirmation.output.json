@@ -1,0 +1,19 @@
+{
+  "proposalId": "dc670ae1-6da2-4788-9b63-d4d08f0aab95",
+  "requestId": "pair-001",
+  "assetId": "M01",
+  "channel": "short-video",
+  "requiredTime": "2026-12-01T18:00:00+08:00",
+  "suggestedTime": "2026-12-01T19:00:00+08:00",
+  "confirmedTime": "2026-12-01T19:00:00+08:00",
+  "status": "saved",
+  "reason": null,
+  "nextStep": null,
+  "reviewStatus": "pass",
+  "ruleVersion": "2026-11-10.1",
+  "risks": [],
+  "missing": [],
+  "saveStatus": "saved",
+  "draftId": "ecd3fe11-cdc0-4fc5-815d-073edb715af2",
+  "trace": "examples/mock/confirmation.trace.jsonl"
+}

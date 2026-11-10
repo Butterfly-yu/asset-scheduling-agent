@@ -1,0 +1,33 @@
+{
+  "requestId": "missing-001",
+  "mode": "live",
+  "model": "deepseek-flash",
+  "status": "action_required",
+  "items": [
+    {
+      "assetId": "M02",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "needs_info",
+      "reason": "MISSING_ASSET_INFO",
+      "stopReason": null,
+      "nextStep": "补全列出的资料后重跑请求。",
+      "reviewStatus": "missing_info",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [
+        "licensed"
+      ],
+      "scheduleStatus": "needs_info",
+      "requestedSlotStatus": "unchecked",
+      "suggestedTime": null,
+      "alternatives": [],
+      "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [],
+      "saveStatus": "not_attempted",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/live/missing.trace.jsonl"
+}

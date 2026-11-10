@@ -37,6 +37,36 @@
       "pass": true,
       "status": "incomplete",
       "draftCount": 0
+    },
+    {
+      "case": "query-failure",
+      "pass": true,
+      "status": "incomplete",
+      "draftCount": 0
+    },
+    {
+      "case": "occupied-alternative",
+      "pass": true,
+      "status": "pending_confirmation",
+      "draftCount": 0
+    },
+    {
+      "case": "no-alternative",
+      "pass": true,
+      "status": "incomplete",
+      "draftCount": 0
+    },
+    {
+      "case": "confirmation",
+      "pass": true,
+      "status": "saved",
+      "draftCount": 1
+    },
+    {
+      "case": "stale-confirmation",
+      "pass": true,
+      "status": "incomplete",
+      "draftCount": 0
     }
   ]
 }

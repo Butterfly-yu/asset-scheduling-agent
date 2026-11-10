@@ -10,15 +10,21 @@
       "requiredTime": "2026-12-01T18:00:00+08:00",
       "status": "saved",
       "reason": null,
+      "stopReason": null,
+      "nextStep": null,
       "reviewStatus": "pass",
       "ruleVersion": "2026-11-10.1",
       "risks": [],
       "missing": [],
       "scheduleStatus": "scheduled",
+      "requestedSlotStatus": "available",
       "suggestedTime": "2026-12-01T18:00:00+08:00",
+      "alternatives": [],
       "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [],
       "saveStatus": "saved",
-      "draftId": "61cdd91f-1a9b-4ab0-a0cf-6afb907c810f"
+      "draftId": "d95943f4-7eda-4e28-8321-c3f37ca5a704"
     }
   ],
   "trace": "examples/mock/available.trace.jsonl"

@@ -1,0 +1,12 @@
+[
+  {
+    "proposalId": "1bc22ce2-7687-44f1-8e0d-883c957768a1",
+    "requestId": "pair-001",
+    "assetId": "M01",
+    "channel": "short-video",
+    "requiredTime": "2026-12-01T18:00:00+08:00",
+    "suggestedTime": "2026-12-01T19:00:00+08:00",
+    "draftId": "ad5356e3-740a-4e34-9acc-09f20830794b",
+    "status": "confirmed"
+  }
+]

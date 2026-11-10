@@ -1,0 +1,1 @@
+{"step":1,"action":"confirm_proposal","args":{"proposalId":"1bc22ce2-7687-44f1-8e0d-883c957768a1"},"result":{"code":"SAVED","draftId":"ad5356e3-740a-4e34-9acc-09f20830794b"},"nextAction":"finish:saved","basis":"人工确认绑定提案，使用 SQLite 提交回执","mode":"human_confirmation","requestId":"pair-001"}

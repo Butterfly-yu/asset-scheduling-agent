@@ -1,0 +1,1 @@
+{"step":1,"action":"confirm_proposal","args":{"proposalId":"354e83ed-964b-4065-a45b-c9deab2f7cda"},"result":{"code":"SLOT_TAKEN","draftId":null},"nextAction":"finish:incomplete","basis":"未提交确认草稿，原因见结果码","mode":"human_confirmation","requestId":"pair-001"}

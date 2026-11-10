@@ -1,0 +1,19 @@
+{
+  "proposalId": "354e83ed-964b-4065-a45b-c9deab2f7cda",
+  "requestId": "pair-001",
+  "assetId": "M01",
+  "channel": "short-video",
+  "requiredTime": "2026-12-01T18:00:00+08:00",
+  "suggestedTime": "2026-12-01T19:00:00+08:00",
+  "confirmedTime": null,
+  "status": "incomplete",
+  "reason": "SLOT_TAKEN",
+  "nextStep": "建议时段已被占用；用同一原始请求重新查找候选。",
+  "reviewStatus": "pass",
+  "ruleVersion": "2026-11-10.1",
+  "risks": [],
+  "missing": [],
+  "saveStatus": "not_attempted",
+  "draftId": null,
+  "trace": "examples/mock/stale-confirmation.trace.jsonl"
+}

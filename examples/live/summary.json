@@ -13,6 +13,42 @@
       "pass": true,
       "status": "pending_confirmation",
       "draftCount": 0
+    },
+    {
+      "case": "missing",
+      "pass": true,
+      "status": "needs_info",
+      "draftCount": 0
+    },
+    {
+      "case": "risk",
+      "pass": true,
+      "status": "blocked",
+      "draftCount": 0
+    },
+    {
+      "case": "replay",
+      "pass": true,
+      "status": "saved",
+      "draftCount": 1
+    },
+    {
+      "case": "write-failure",
+      "pass": true,
+      "status": "incomplete",
+      "draftCount": 0
+    },
+    {
+      "case": "query-failure",
+      "pass": true,
+      "status": "incomplete",
+      "draftCount": 0
+    },
+    {
+      "case": "confirmation",
+      "pass": true,
+      "status": "saved",
+      "draftCount": 1
     }
   ]
 }

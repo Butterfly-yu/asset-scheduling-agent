@@ -1,0 +1,36 @@
+{
+  "requestId": "risk-001",
+  "mode": "live",
+  "model": "deepseek-flash",
+  "status": "action_required",
+  "items": [
+    {
+      "assetId": "M03",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "blocked",
+      "reason": "RULE_VIOLATION",
+      "stopReason": null,
+      "nextStep": "处理风险后重新审核。",
+      "reviewStatus": "blocked",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [
+        {
+          "ruleId": "R-LICENSE",
+          "reason": "未取得素材授权"
+        }
+      ],
+      "missing": [],
+      "scheduleStatus": "blocked",
+      "requestedSlotStatus": "unchecked",
+      "suggestedTime": null,
+      "alternatives": [],
+      "needsConfirmation": false,
+      "proposalId": null,
+      "toolErrors": [],
+      "saveStatus": "not_attempted",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/live/risk.trace.jsonl"
+}

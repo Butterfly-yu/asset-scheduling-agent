@@ -4,7 +4,7 @@ import type { ToolResult } from './tools.ts';
 export type Call = {id:string; type:'function'; function:{name:string; arguments:string}};
 export type Message = {role:'system'|'user'|'assistant'|'tool'; content:string|null; tool_calls?:Call[]; tool_call_id?:string};
 export type Reply = {calls:Call[]; text:string|null};
-export type Decide = (history:Message[], signal:AbortSignal) => Promise<Reply>;
+export type Decide = (history:Message[], signal:AbortSignal, offered?:typeof tools) => Promise<Reply>;
 
 export function liveModel(env = process.env, fetcher = fetch) {
   const key = env.AGENT_API_KEY?.trim();
@@ -16,12 +16,12 @@ export function liveModel(env = process.env, fetcher = fetch) {
   if (base.protocol !== 'https:' || base.username || base.password || base.search || base.hash)
     throw new Error('AGENT_BASE_URL 须为无凭据、查询或片段的 HTTPS API 地址');
   base.pathname = base.pathname.replace(/\/+$/, '') + '/chat/completions';
-  const decide: Decide = async (messages, signal) => {
+  const decide: Decide = async (messages, signal, offered = tools) => {
     let response: Response;
     try {
       response = await fetcher(base, {method:'POST', signal, redirect:'error',
         headers:{authorization:'Bearer '+key,'content-type':'application/json'},
-        body:JSON.stringify({model,messages,tools,tool_choice:'auto',stream:false,
+        body:JSON.stringify({model,messages,tools:offered,tool_choice:'auto',stream:false,
           ...(provider === 'deepseek' ? {thinking:{type:'disabled'}} : {})})});
     } catch {
       throw new Error(signal.aborted ? 'MODEL_TIMEOUT' : 'MODEL_NETWORK_ERROR');

@@ -170,7 +170,7 @@ test('DeepSeek 适配器按协议回传 tool_call_id 和工具结果；此测试
     assert.equal((init?.headers as Record<string,string>).authorization,'Bearer synthetic-test-key');
     const payload=JSON.parse(String(init?.body));
     assert.deepEqual(payload.thinking,{type:'disabled'});
-    assert.equal(payload.tools.length,4);
+    assert.deepEqual(payload.tools.map((t:{function:{name:string}})=>t.function.name),[['get_asset'],['get_asset','check_rules'],['get_asset','check_rules','query_slots'],['get_asset','check_rules','query_slots','save_draft'],['get_asset','check_rules','query_slots']][count]);
     if(count++) {
       const prior=payload.messages.at(-1);
       assert.equal(prior.role,'tool');

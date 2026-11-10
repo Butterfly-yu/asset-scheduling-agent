@@ -1,23 +1,30 @@
 # 评估记录
 
-实际结果见 [Mock 汇总](../examples/mock/summary.json) 和 [自动测试日志](../examples/test-results.txt)。演示脚本对每个场景留存三类证据：`*.output.json`、`*.trace.jsonl`、`*.db.json`。这些 Mock 轨迹来自实际运行，但不证明真实模型决策。
+在 Node.js v26.13.0 下执行了 24 项自动测试和 11 个离线演示场景，均通过。见 [自动测试日志](../examples/test-results.txt)、[离线汇总](../examples/mock/summary.json)。脚本为每个场景留存 `*.output.json`、`*.trace.jsonl` 和 `*.db.json`。离线记录来自实际执行，不能证明真实模型决策。
 
-| 场景 | 输入 | 实际输出 | Trace |
-|---|---|---|---|
-| 正常 | [同一排期请求](../examples/paired.input.json) | [保存草稿](../examples/mock/available.output.json) | [available](../examples/mock/available.trace.jsonl) |
-| 冲突 | 同一排期请求；仅变更占用种子 | [候选 19:00，待确认](../examples/mock/conflict.output.json) | [conflict](../examples/mock/conflict.trace.jsonl) |
-| 缺资料 | [缺授权字段](../examples/missing.input.json) | [请求补充](../examples/mock/missing.output.json) | [missing](../examples/mock/missing.trace.jsonl) |
-| 规则风险 | [无使用授权](../examples/risk.input.json) | [明确阻断](../examples/mock/risk.output.json) | [risk](../examples/mock/risk.trace.jsonl) |
-| 重复提交 | 同一排期请求和同一库 | [复用原 ID](../examples/mock/replay.output.json) | [replay](../examples/mock/replay.trace.jsonl) |
-| 保存失败 | 同一排期请求；插入后、提交前注入错误 | [未完成且无回执](../examples/mock/write-failure.output.json) | [write-failure](../examples/mock/write-failure.trace.jsonl) |
-
-自动测试另覆盖：授权绕过、过期的时段查询、伪造候选或回执、预算耗尽、模型断开时保存结果保留、部分成功、时区规范化和工具协议。协议测试使用注入的 HTTP 响应，未向远端发送请求。
-
-2026-11-10 使用 DeepSeek 官方 API（`deepseek-flash`，关闭深度思考），在 Node.js v26.13.0 下执行 `npm run demo -- --mode live`。两条场景均通过脚本断言，见[实际汇总](../examples/live/summary.json)。两次使用相同请求和各自全新的 SQLite 库，只改变 18:00 的占用。
-
-| 场景 | 实际模型行为 | 数据库证据 |
+| 场景 | 输入或条件 | 离线结果 |
 |---|---|---|
-| 空闲 | 第 3 轮看到 18:00 可用，第 4 轮调用保存，结果为已保存。[Trace](../examples/live/available.trace.jsonl) · [输出](../examples/live/available.output.json) | [一条草稿](../examples/live/available.db.json) |
-| 冲突 | 第 3 轮看到 18:00 被占用，第 4 轮查替代时段。第 5 轮尝试保存 19:00，被工具以 `CONFIRMATION_REQUIRED` 拒绝；最终建议 19:00 并等待确认，原始要求仍为 18:00。[Trace](../examples/live/conflict.trace.jsonl) · [输出](../examples/live/conflict.output.json) | [零条草稿](../examples/live/conflict.db.json) |
+| 正常 | [原始请求](../examples/paired.input.json)，18:00 空闲 | [一条草稿](../examples/mock/available.output.json) |
+| 时段冲突 | 同一请求，仅切换 [已有占用](../data/occupied.json) | [19:00 待确认，草稿为零](../examples/mock/conflict.output.json) |
+| 缺资料 | [缺授权字段](../examples/missing.input.json) | [列出待补项](../examples/mock/missing.output.json) |
+| 规则风险 | [无使用授权](../examples/risk.input.json) | [明确阻断](../examples/mock/risk.output.json) |
+| 重复提交 | 同一请求、同一个库 | [复用原 ID](../examples/mock/replay.output.json) |
+| 保存失败 | 插入后、提交前注入失败 | [WRITE_FAILED，无草稿](../examples/mock/write-failure.output.json) |
+| 时段查询失败 | 注入原时段查询失败 | [SLOT_QUERY_FAILED，注明作用域](../examples/mock/query-failure.output.json) |
+| 备选时段变化 | [18:00 和 19:00 均占用](../data/occupied-next.json) | [改建议 20:00](../examples/mock/occupied-alternative.output.json) |
+| 无备选 | [搜索窗口已占满](../data/occupied-all.json) | [NO_ALTERNATIVE_SLOT](../examples/mock/no-alternative.output.json) |
+| 确认与重放 | 同一个库中人工确认同一提案两次 | [19:00 已存，保留 18:00 原要求](../examples/mock/confirmation.output.json) |
+| 确认时被抢占 | 生成提案后再写入 [19:00 占用](../data/occupied-next.json) | [SLOT_TAKEN，草稿为零](../examples/mock/stale-confirmation.output.json) |
 
-冲突用例通过是因为模型确实根据新观察补查，且业务约束阻止了未授权写入。模型发出了本可避免的保存调用，这仍是决策质量上的不足；`saveStatus: not_attempted` 表示没有进入数据库写入，不代表模型没有请求保存。样本量为每个场景一次，不能据此推断长期稳定性。
+额外单测覆盖：确认前素材授权变化、确认写入回滚、伪造调用、同一回合夹带后续动作、执行预算耗尽、模型断开时保留已提交结果、批次部分成功和时区校验。协议适配测试使用注入响应，不调用远端。
+
+2026-11-10 使用 DeepSeek 官方 API（`deepseek-flash`、关闭深度思考）运行最终版。见 [真实模式汇总](../examples/live/summary.json)。8 个场景通过：6 个实际调用模型，重放和显式确认由程序独立执行。
+
+| 关键真实路径 | 观察与下一步 | 数据库结果 |
+|---|---|---|
+| 18:00 空闲 | 模型看到可用后才调用保存。[Trace](../examples/live/available.trace.jsonl) | [一条草稿](../examples/live/available.db.json) |
+| 18:00 占用 | 模型看到占用后另起一轮查备选，选出 19:00 并结束，没有调用保存。[Trace](../examples/live/conflict.trace.jsonl) | [零条草稿](../examples/live/conflict.db.json)，[提案已记录](../examples/live/conflict.proposals.json) |
+| 查询失败 | 明确输出查询错误，随后未发起查询或保存。[Trace](../examples/live/query-failure.trace.jsonl) · [输出](../examples/live/query-failure.output.json) | [零条草稿](../examples/live/query-failure.db.json) |
+| 人工确认 | 用户动作由 CLI 执行；确认时重新审核和查询后保存，原 18:00 保留。[Trace](../examples/live/confirmation.trace.jsonl) | [19:00 一条草稿](../examples/live/confirmation.db.json) |
+
+历史对照：初版真实轨迹保留在 Git 提交 `3f6ef9477ece437a898d0043a28ab31e62d12449`。初版模型尝试保存备选，被 `CONFIRMATION_REQUIRED` 拒绝；最终版没有这一步。迭代中间版曾在查询失败后尝试备选查询，收紧查询权限后由最终版的评测断言检查是否还会发生。这些是小样本回归，不能推断模型长期稳定性。

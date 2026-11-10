@@ -59,3 +59,43 @@ export function nearby(time: string): string[] {
   return [1,2,3].filter(n => hour+n < 24)
     .map(n => time.slice(0,11) + String(hour+n).padStart(2,'0') + time.slice(13));
 }
+
+const isRecord = (value:unknown): value is Record<string,unknown> =>
+  !!value && typeof value==='object' && !Array.isArray(value);
+
+export function parseAssets(value:unknown): Record<string,Asset> {
+  if(!isRecord(value)) throw new Error('素材文件必须是以 ID 为键的对象');
+  const assets:Record<string,Asset> = Object.create(null);
+  for(const [id,raw] of Object.entries(value)) {
+    if(!token.test(id) || !isRecord(raw)) throw new Error('素材条目的 ID 或结构无效');
+    const {title,licensed,channels}=raw;
+    if((title!=null && typeof title!=='string') || (licensed!=null && typeof licensed!=='boolean')
+      || (channels!=null && (!Array.isArray(channels) || !channels.every(c=>typeof c==='string' && token.test(c)))))
+      throw new Error('素材 '+id+' 的字段类型无效');
+    assets[id]={title:title==null?undefined:title as string,licensed:licensed==null?undefined:licensed as boolean,
+      channels:channels==null?undefined:channels as string[]};
+  }
+  return assets;
+}
+
+export function parseRules(value:unknown): Rules {
+  if(!isRecord(value) || typeof value.version!=='string' || !value.version.trim()
+      || typeof value.licenseRuleId!=='string' || !token.test(value.licenseRuleId)
+      || typeof value.channelRuleId!=='string' || !token.test(value.channelRuleId)
+      || !Array.isArray(value.required) || !value.required.every(k=>['title','licensed','channels'].includes(k))
+      || !value.required.includes('licensed') || !value.required.includes('channels'))
+    throw new Error('规则配置无效；必须包含版本、规则 ID 以及 licensed、channels 必填项');
+  return {version:value.version, licenseRuleId:value.licenseRuleId, channelRuleId:value.channelRuleId,
+    required:[...new Set(value.required as (keyof Asset)[])]};
+}
+
+export function parseSchedule(value:unknown): Seed[] {
+  if(!Array.isArray(value)) throw new Error('已有排期文件必须是数组');
+  return value.map(row=>{
+    if(!isRecord(row) || typeof row.channel!=='string' || !token.test(row.channel)
+        || typeof row.time!=='string' || (row.label!==undefined && typeof row.label!=='string'))
+      throw new Error('已有排期需包含合法渠道和时间');
+    normalizeTime(row.time);
+    return {channel:row.channel,time:row.time,label:typeof row.label==='string'?row.label:''};
+  });
+}
