@@ -2,6 +2,12 @@
 
 内容运营提交素材、渠道和硬性时段。Agent 核对审核规则、查时段、保存草稿；遇到冲突时提出可确认的备选。**待确认提案不占用时段；人工确认后才可能保存草稿。** 项目没有发布入口。
 
+## 评审先看：同一请求，两条真实路径
+
+- [18:00 空闲的真实轨迹](examples/live/available.trace.jsonl)：模型看到空闲，才调用保存。
+- [初版冲突轨迹](examples/trajectory-eval/baseline-original-conflict.trace.jsonl) 与 [改进版冲突轨迹](examples/live/conflict.trace.jsonl)：两者都先补查备选；初版曾尝试保存 19:00 并被拒绝，改进版直接结束并记录待确认提案。
+- [重复对照汇总](examples/trajectory-eval/summary.json) · [逐次原始证据](examples/trajectory-eval/runs.jsonl)：初版完整通过 4/5 组，改进版通过 5/5 组。两版这批运行都未尝试保存冲突时段；初版有一次补查正确但最终回复格式未通过。
+
 ## 快速运行
 
 需要 Node.js 24+，验证环境为 Node.js v26.13.0。无第三方依赖。以下命令在仓库根目录执行，默认不需要密钥：
@@ -37,6 +43,17 @@ npm run demo -- --mode live
 ```
 
 脚本会保存真实模型输出、Trace、草稿快照和评测汇总；其中重放和人工确认步骤由确定性程序执行。真实模式不会在远端失败时回退到 Mock。
+
+## 重复评测
+
+默认离线运行，写入 Git 忽略的 `.local/trajectory-eval`。真实模式会使用本机模型配置；不传 `--baseline` 时仅测当前版。要复现双版本对照：
+
+```powershell
+git worktree add --detach .local/trajectory-baseline 3f6ef9477ece437a898d0043a28ab31e62d12449
+npm run eval:trajectory -- --mode live --repeats 5 --baseline .local/trajectory-baseline
+```
+
+运行失败的场景也会写入报告。保存成功需要 SQLite 行与结果中的草稿 ID 对得上；冲突分支要看到模型在后续回合补查，而且没有写草稿。多余的保存尝试单独计数。
 
 ## 评审入口
 
