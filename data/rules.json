@@ -1,0 +1,6 @@
+{
+  "version": "2026-11-10.1",
+  "required": ["title", "licensed", "channels"],
+  "licenseRuleId": "R-LICENSE",
+  "channelRuleId": "R-CHANNEL"
+}

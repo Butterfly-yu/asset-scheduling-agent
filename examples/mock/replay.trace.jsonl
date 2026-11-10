@@ -1,0 +1,1 @@
+{"assetId":"M01","mode":"mock","step":1,"turn":0,"action":"replay","args":{},"result":{"code":"REQUEST_REPLAY","draftId":"61cdd91f-1a9b-4ab0-a0cf-6afb907c810f"},"nextAction":"finish","basis":"跳过已保存项，复用原回执","requestId":"pair-001","model":"deterministic-mock"}

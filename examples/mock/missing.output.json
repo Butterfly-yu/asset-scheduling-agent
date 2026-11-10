@@ -1,0 +1,27 @@
+{
+  "requestId": "missing-001",
+  "mode": "mock",
+  "model": "deterministic-mock",
+  "status": "action_required",
+  "items": [
+    {
+      "assetId": "M02",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "needs_info",
+      "reason": "MISSING_ASSET_INFO",
+      "reviewStatus": "missing_info",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [
+        "licensed"
+      ],
+      "scheduleStatus": "needs_info",
+      "suggestedTime": null,
+      "needsConfirmation": false,
+      "saveStatus": "not_attempted",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/mock/missing.trace.jsonl"
+}

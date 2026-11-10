@@ -1,0 +1,25 @@
+{
+  "requestId": "pair-001",
+  "mode": "mock",
+  "model": "deterministic-mock",
+  "status": "incomplete",
+  "items": [
+    {
+      "assetId": "M01",
+      "channel": "short-video",
+      "requiredTime": "2026-12-01T18:00:00+08:00",
+      "status": "incomplete",
+      "reason": "WRITE_FAILED",
+      "reviewStatus": "pass",
+      "ruleVersion": "2026-11-10.1",
+      "risks": [],
+      "missing": [],
+      "scheduleStatus": "unresolved",
+      "suggestedTime": null,
+      "needsConfirmation": false,
+      "saveStatus": "failed",
+      "draftId": null
+    }
+  ],
+  "trace": "examples/mock/write-failure.trace.jsonl"
+}

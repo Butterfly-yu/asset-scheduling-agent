@@ -1,0 +1,6 @@
+{
+  "M01": {"title":"新品介绍","licensed":true,"channels":["short-video","community"]},
+  "M02": {"title":"用户故事","channels":["short-video"]},
+  "M03": {"title":"活动照片","licensed":false,"channels":["short-video"]},
+  "M04": {"title":"幕后花絮","licensed":true,"channels":["short-video"]}
+}
