@@ -2,6 +2,18 @@
 
 31 项自动测试均通过。[实际测试日志](../examples/test-results.txt)
 
+## 评测设计
+
+先固定请求、规则、素材、模型和候选窗口，然后分别在空闲与占用的独立数据库中运行。此处只改变原始时段的占用。轨迹评测要求模型在观察后的另一个回合发起对应动作，保存路径的参数必须是原始时段，冲突路径查询的候选需要包含期望时段。业务评测再独立检查最终状态、确认要求和实际数据库行，分别记录 `decisionPass` 与 `businessPass`。 [评测实现](../scripts/trajectory-metrics.ts)
+
+| 证据 | 验证的问题 |
+| --- | --- |
+| 真实调用 Trace | 模型何时观察到空闲或占用，下一轮选择了哪个工具，传了什么参数。 |
+| CLI 输出和数据库快照 | 审核与确认结果是否正确，草稿数量及 ID 是否与 SQLite 一致。 |
+| 可执行回归测试 | 固定输入或注入故障，检查权限、事务、重放和预算边界。 |
+
+原始 Trace 的 `mode` 标注模型运行方式。Mock 运行使用预设动作验证业务流程。真实模式中的保存失败和查询失败通过应用层注入，验证的是工具报错及其后的决策和输出。
+
 ## 业务验收
 
 以下 8 个场景保留同一批真实模式验收记录。6 个场景调用 DeepSeek Flash，重放和显式确认由程序独立执行。每个场景都有实际输出、Trace 和草稿快照。[运行汇总](../examples/live/summary.json)
@@ -17,7 +29,7 @@
 | 时段查询失败 | 原始请求加 `--fail-query requested` | [SLOT_QUERY_FAILED，草稿为零](../examples/live/query-failure.output.json) | [Trace](../examples/live/query-failure.trace.jsonl) · [数据库快照](../examples/live/query-failure.db.json) |
 | 人工确认 | 使用冲突运行生成的提案 ID，在同一数据库中确认 | [重新检查并保存 19:00](../examples/live/confirmation.output.json) | [Trace](../examples/live/confirmation.trace.jsonl) · [数据库快照](../examples/live/confirmation.db.json) |
 
-正常和冲突使用同一输入，仅改变 18:00 的占用。模型在看到可用后请求保存，在看到占用后的另一个回合补查备选。冲突输出保留原始 18:00，并给出 19:00 待确认，数据库草稿数为零。
+M01 原始请求固定为 18:00。空闲场景第 3 轮查到 `AVAILABLE`，第 4 轮调用 `save_draft`，实际写入一条对应草稿。冲突场景第 3 轮查到 `OCCUPIED`，第 4 轮以 `scope=alternatives` 查询备选。最终输出仍保留 18:00，建议 19:00 待确认，草稿数为零。人工确认场景使用同一提案 ID 和数据库，确认后生成 19:00 的草稿。 [待确认提案](../examples/live/conflict.proposals.json) · [确认后的提案快照](../examples/live/confirmation.proposals.json)
 
 ## 补充边界
 
@@ -37,8 +49,24 @@
 
 其他自动测试覆盖素材规则变化、确认写入回滚、伪造调用、批次部分成功、时区校验和模型断开时保留回执。协议适配测试使用注入响应。
 
+## 失败及其处置
+
+- **查询失败。** 注入 `--fail-query requested` 后，结果返回 `SLOT_QUERY_FAILED` 和失败的查询范围，没有把查询失败当成空闲。数据库草稿数为零。 [输出](../examples/live/query-failure.output.json)
+- **保存失败。** 注入点位于插入草稿之后、事务提交之前。最终返回 `WRITE_FAILED`，没有草稿 ID，数据库中也没有残留草稿。 [输出](../examples/live/write-failure.output.json) · [快照](../examples/live/write-failure.db.json)
+- **模型给出无效的最终答复。** 早期真实运行曾在正确查询备选后返回无法通过结构检查的答复。现有评测分别记录动作和业务结果，格式错误可使业务判定失败。 [对应评测回归](../tests/trajectory-eval.test.ts)
+- **授权时的观察已过期。** 确认前写入 19:00 的占用后，确认返回 `SLOT_TAKEN`，草稿数为零。另有回归测试覆盖授权变化以及确认事务回滚。 [输出](../examples/mock/stale-confirmation.output.json) · [确认回归](../tests/improvements.test.ts)
+
 ## 复现与限制
 
-`npm test` 运行自动测试。`npm run demo` 运行全部 11 个离线场景，新记录默认写入 `.local/demo/mock/`。`npm run demo -- --mode live` 运行 8 个真实模式场景，新记录写入 `.local/demo/live/`。使用 `--out DIR` 可显式指定留存位置。
+在项目根目录执行。演示生成的新证据写入 `.local/demo/`，也可以用 `--out DIR` 指定位置。
 
-轨迹评测检查动作是否发生在相应观察之后，业务评测核对输出与 SQLite 行。样例覆盖的是离散时段和合成规则，备选范围为同日向后 1–3 小时。真实模型记录的场景和重复次数有限。
+```powershell
+npm test
+npm run demo
+npm run demo -- --mode live
+npm run eval:trajectory -- --mode live --repeats 1
+```
+
+`npm test` 覆盖 31 项回归。离线演示覆盖 11 个场景，仓库保留 3 组补充边界记录。真实模式演示覆盖 8 个验收场景，其中 6 个调用模型，其余验证程序的重放和人工确认。最后一条命令用于单独复现空闲与占用的配对评测，需要模型凭据。
+
+真实轨迹来自少量合成场景，尚未测量真实运营数据上的成功率、高并发性能或跨日区间调度。评估证明的是仓库示例中的决策链路、授权边界和实际持久化结果。
