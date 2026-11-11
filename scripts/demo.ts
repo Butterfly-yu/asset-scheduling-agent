@@ -2,15 +2,19 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, rmdirSync, writeFileSync 
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { parseArgs } from 'node:util';
 import assert from 'node:assert/strict';
 
 type Case = {name:string; input:'paired'|'missing'|'risk'; want:string; count:number;
   db?:string; scenario?:'occupied'; schedule?:string; failSave?:boolean; failQuery?:'requested'|'alternatives'; offlineOnly?:boolean};
-const raw = process.argv.slice(2);
-const mode = raw.length === 0 ? 'mock' : raw.length === 2 && raw[0] === '--mode' ? raw[1] : '';
-if (mode !== 'mock' && mode !== 'live') throw new Error('usage: npm run demo -- [--mode mock|live]');
+const {values,positionals} = parseArgs({options:{
+  mode:{type:'string',default:'mock'},out:{type:'string'}
+},allowPositionals:true});
+const mode = values.mode;
+if (positionals.length || (mode !== 'mock' && mode !== 'live'))
+  throw new Error('usage: npm run demo -- [--mode mock|live] [--out DIR]');
 const workspace = mkdtempSync(join(tmpdir(),'asset-agent-'));
-const dir = join('examples',mode);
+const dir = values.out ?? join('.local','demo',mode);
 mkdirSync(dir,{recursive:true});
 const sameDb = join(workspace,'available.sqlite');
 const conflictDb = join(workspace,'conflict.sqlite');

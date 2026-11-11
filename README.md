@@ -2,15 +2,15 @@
 
 内容运营提交素材、渠道和硬性时段。Agent 核对审核规则、查时段、保存草稿；遇到冲突时提出可确认的备选。**待确认提案不占用时段；人工确认后才可能保存草稿。** 项目没有发布入口。
 
-## 评审先看：同一请求，两条真实路径
+## 系统结构
 
-- [18:00 空闲的真实轨迹](examples/live/available.trace.jsonl)：模型看到空闲，才调用保存。
-- [初版冲突轨迹](examples/trajectory-eval/baseline-original-conflict.trace.jsonl) 与 [改进版冲突轨迹](examples/live/conflict.trace.jsonl)：两者都先补查备选；初版曾尝试保存 19:00 并被拒绝，改进版直接结束并记录待确认提案。
-- [重复对照汇总](examples/trajectory-eval/summary.json) · [逐次原始证据](examples/trajectory-eval/runs.jsonl)：初版完整通过 4/5 组，改进版通过 5/5 组。两版这批运行都未尝试保存冲突时段；初版有一次补查正确但最终回复格式未通过。
+单 Agent 通过工具读取素材、核对规则、查询排期和保存草稿。Harness 管理工具权限与执行预算，每次调用前复核授权，并将工具结果送回模型。人工确认绑定具体提案，确认时重新检查审核和占用。SQLite 事务与唯一约束保证保存和重放的一致性。
+
+[架构与取舍](docs/02-solution.md) · [真实决策链路](examples/harness-smoke/runs.jsonl) · [验收入口](docs/03-evaluation.md)
 
 ## 快速运行
 
-需要 Node.js 24+，验证环境为 Node.js v26.13.0。无第三方依赖。以下命令在仓库根目录执行，默认不需要密钥：
+需要 Node.js 24+，验证环境为 Node.js v26.13.0。无第三方依赖。以下命令在仓库根目录执行，演示结果保存在 `.local/demo/mock/`。
 
 ```powershell
 npm test
@@ -42,24 +42,22 @@ node src/cli.ts inspect --db .local/review.sqlite
 npm run demo -- --mode live
 ```
 
-脚本会保存真实模型输出、Trace、草稿快照和评测汇总；其中重放和人工确认步骤由确定性程序执行。真实模式不会在远端失败时回退到 Mock。
+演示脚本把新输出、Trace 和数据库快照写入 `.local/demo/<mode>/`。使用 `--out DIR` 可以指定输出目录。仓库已留存的验收记录由评估文档逐例索引。
 
-## 重复评测
+## 轨迹评测
 
-默认离线运行，写入 Git 忽略的 `.local/trajectory-eval`。真实模式会使用本机模型配置；不传 `--baseline` 时仅测当前版。要复现双版本对照：
+评测脚本检查模型看到工具结果后是否选择相应动作，并核对输出中的时段、确认状态、草稿 ID 和数据库行。结果默认写入 `.local/trajectory-eval/`。
 
 ```powershell
-git worktree add --detach .local/trajectory-baseline 3f6ef9477ece437a898d0043a28ab31e62d12449
-npm run eval:trajectory -- --mode live --repeats 5 --baseline .local/trajectory-baseline
+npm run eval:trajectory -- --mode mock --repeats 5
+npm run eval:trajectory -- --mode live --repeats 5
 ```
-
-运行失败的场景也会写入报告。保存成功需要 SQLite 行与结果中的草稿 ID 对得上；冲突分支要看到模型在后续回合补查，而且没有写草稿。多余的保存尝试单独计数。
 
 ## 评审入口
 
 | 检查项 | 文件 |
 |---|---|
-| 所有验收及两种真实轨迹 | [评估](docs/03-evaluation.md) · [真实模式汇总](examples/live/summary.json) · [离线汇总](examples/mock/summary.json) |
+| 所有验收及两种真实轨迹 | [评估](docs/03-evaluation.md) · [真实模式汇总](examples/live/summary.json) · [边界场景汇总](examples/mock/summary.json) |
 | 自动测试 | [基础用例](tests/agent.test.ts) · [确认和故障用例](tests/improvements.test.ts) · [实际日志](examples/test-results.txt) |
 | 业务与方案 | [需求](docs/01-requirements.md) · [方案](docs/02-solution.md) |
 | AI 使用与复盘 | [AI 使用](docs/04-ai-usage.md) · [复盘](docs/05-retrospective.md) |

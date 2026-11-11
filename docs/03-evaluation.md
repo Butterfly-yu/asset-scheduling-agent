@@ -1,50 +1,44 @@
 # 评估记录
 
-在 Node.js v26.13.0 下执行了 31 项自动测试和 11 个离线演示场景，均通过。见 [自动测试日志](../examples/test-results.txt)、[离线汇总](../examples/mock/summary.json)。脚本为每个场景留存 `*.output.json`、`*.trace.jsonl` 和 `*.db.json`。离线记录来自实际执行，不能证明真实模型决策。
+31 项自动测试均通过。[实际测试日志](../examples/test-results.txt)
 
-| 场景 | 输入与执行条件 | 实际离线结果 | 运行记录 |
+## 业务验收
+
+以下 8 个场景保留同一批真实模式验收记录。6 个场景调用 DeepSeek Flash，重放和显式确认由程序独立执行。每个场景都有实际输出、Trace 和草稿快照。[运行汇总](../examples/live/summary.json)
+
+| 场景 | 输入与执行条件 | 实际输出 | 验证记录 |
 |---|---|---|---|
-| 正常 | [原始请求](../examples/paired.input.json)，18:00 空闲 | [一条草稿](../examples/mock/available.output.json) | [Trace](../examples/mock/available.trace.jsonl) · [数据库快照](../examples/mock/available.db.json) |
-| 时段冲突 | [原始请求](../examples/paired.input.json)，`--scenario occupied` 加载 [已有占用](../data/occupied.json) | [19:00 待确认，草稿为零](../examples/mock/conflict.output.json) | [Trace](../examples/mock/conflict.trace.jsonl) · [数据库快照](../examples/mock/conflict.db.json) |
-| 缺资料 | [缺授权字段的请求](../examples/missing.input.json) | [列出待补项](../examples/mock/missing.output.json) | [Trace](../examples/mock/missing.trace.jsonl) · [数据库快照](../examples/mock/missing.db.json) |
-| 规则风险 | [无使用授权的请求](../examples/risk.input.json) | [明确阻断](../examples/mock/risk.output.json) | [Trace](../examples/mock/risk.trace.jsonl) · [数据库快照](../examples/mock/risk.db.json) |
-| 重复提交 | [原始请求](../examples/paired.input.json)，同一 `--db` 连续提交两次 | [复用原 ID](../examples/mock/replay.output.json) | [Trace](../examples/mock/replay.trace.jsonl) · [数据库快照](../examples/mock/replay.db.json) |
-| 保存失败 | [原始请求](../examples/paired.input.json) 加 `--fail-save`，插入后、提交前注入失败 | [WRITE_FAILED，无草稿](../examples/mock/write-failure.output.json) | [Trace](../examples/mock/write-failure.trace.jsonl) · [数据库快照](../examples/mock/write-failure.db.json) |
-| 时段查询失败 | [原始请求](../examples/paired.input.json) 加 `--fail-query requested` | [SLOT_QUERY_FAILED，注明作用域](../examples/mock/query-failure.output.json) | [Trace](../examples/mock/query-failure.trace.jsonl) · [数据库快照](../examples/mock/query-failure.db.json) |
-| 备选时段变化 | [原始请求](../examples/paired.input.json) 加 `--schedule data/occupied-next.json` | [改建议 20:00](../examples/mock/occupied-alternative.output.json) | [Trace](../examples/mock/occupied-alternative.trace.jsonl) · [数据库快照](../examples/mock/occupied-alternative.db.json) |
-| 无备选 | [原始请求](../examples/paired.input.json) 加 `--schedule data/occupied-all.json` | [NO_ALTERNATIVE_SLOT](../examples/mock/no-alternative.output.json) | [Trace](../examples/mock/no-alternative.trace.jsonl) · [数据库快照](../examples/mock/no-alternative.db.json) |
-| 确认与重放 | 对时段冲突生成的提案，用同一 `--db` 和 `--proposal` 确认两次 | [19:00 已存，保留 18:00 原要求](../examples/mock/confirmation.output.json) | [Trace](../examples/mock/confirmation.trace.jsonl) · [数据库快照](../examples/mock/confirmation.db.json) |
-| 确认时被抢占 | 生成提案后，用 `--schedule data/occupied-next.json` 载入 [19:00 占用](../data/occupied-next.json) 再确认 | [SLOT_TAKEN，草稿为零](../examples/mock/stale-confirmation.output.json) | [Trace](../examples/mock/stale-confirmation.trace.jsonl) · [数据库快照](../examples/mock/stale-confirmation.db.json) |
+| 正常排期 | [原始请求](../examples/paired.input.json)，18:00 空闲 | [保存一条草稿](../examples/live/available.output.json) | [Trace](../examples/live/available.trace.jsonl) · [数据库快照](../examples/live/available.db.json) |
+| 时段冲突 | [原始请求](../examples/paired.input.json)，`--scenario occupied` | [建议 19:00，等待确认](../examples/live/conflict.output.json) | [Trace](../examples/live/conflict.trace.jsonl) · [数据库快照](../examples/live/conflict.db.json) |
+| 素材信息缺失 | [缺字段请求](../examples/missing.input.json) | [列出缺失字段](../examples/live/missing.output.json) | [Trace](../examples/live/missing.trace.jsonl) · [数据库快照](../examples/live/missing.db.json) |
+| 规则风险 | [未授权素材请求](../examples/risk.input.json) | [明确阻断](../examples/live/risk.output.json) | [Trace](../examples/live/risk.trace.jsonl) · [数据库快照](../examples/live/risk.db.json) |
+| 重复提交 | 原始请求与同一 `--db` 连续执行两次 | [复用同一草稿 ID](../examples/live/replay.output.json) | [Trace](../examples/live/replay.trace.jsonl) · [数据库快照](../examples/live/replay.db.json) |
+| 保存失败 | 原始请求加 `--fail-save` | [WRITE_FAILED，草稿为零](../examples/live/write-failure.output.json) | [Trace](../examples/live/write-failure.trace.jsonl) · [数据库快照](../examples/live/write-failure.db.json) |
+| 时段查询失败 | 原始请求加 `--fail-query requested` | [SLOT_QUERY_FAILED，草稿为零](../examples/live/query-failure.output.json) | [Trace](../examples/live/query-failure.trace.jsonl) · [数据库快照](../examples/live/query-failure.db.json) |
+| 人工确认 | 使用冲突运行生成的提案 ID，在同一数据库中确认 | [重新检查并保存 19:00](../examples/live/confirmation.output.json) | [Trace](../examples/live/confirmation.trace.jsonl) · [数据库快照](../examples/live/confirmation.db.json) |
 
-额外单测覆盖：确认前素材授权变化、确认写入回滚、伪造调用、同一回合夹带后续动作、执行预算耗尽、模型断开时保留已提交结果、批次部分成功和时区校验。协议适配测试使用注入响应，不调用远端。预算边界测试覆盖模型回合和工具调用上限。最后一次允许的保存已经提交时，运行状态为 `incomplete`，停止原因为 `BUDGET_EXHAUSTED`，同时保留 `saveStatus: saved` 和草稿 ID。同一请求重试时复用该草稿。最后一次保存失败时，输出同时保留 `WRITE_FAILED` 与预算停止原因。
+正常和冲突使用同一输入，仅改变 18:00 的占用。模型在看到可用后请求保存，在看到占用后的另一个回合补查备选。冲突输出保留原始 18:00，并给出 19:00 待确认，数据库草稿数为零。
 
-2026-11-10 使用 DeepSeek 官方 API（`deepseek-flash`、关闭深度思考）运行最终版。见 [真实模式汇总](../examples/live/summary.json)。8 个场景通过：6 个实际调用模型，重放和显式确认由程序独立执行。
+## 补充边界
 
-| 关键真实路径 | 观察与下一步 | 数据库结果 |
-|---|---|---|
-| 18:00 空闲 | 模型看到可用后才调用保存。[Trace](../examples/live/available.trace.jsonl) | [一条草稿](../examples/live/available.db.json) |
-| 18:00 占用 | 模型看到占用后另起一轮查备选，选出 19:00 并结束，没有调用保存。[Trace](../examples/live/conflict.trace.jsonl) | [零条草稿](../examples/live/conflict.db.json)，[提案已记录](../examples/live/conflict.proposals.json) |
-| 查询失败 | 明确输出查询错误，随后未发起查询或保存。[Trace](../examples/live/query-failure.trace.jsonl) · [输出](../examples/live/query-failure.output.json) | [零条草稿](../examples/live/query-failure.db.json) |
-| 人工确认 | 用户动作由 CLI 执行；确认时重新审核和查询后保存，原 18:00 保留。[Trace](../examples/live/confirmation.trace.jsonl) | [19:00 一条草稿](../examples/live/confirmation.db.json) |
+以下 3 组离线记录验证不同占用条件和确认时的竞态。Mock 记录只验证流程。[边界场景汇总](../examples/mock/summary.json)
 
-历史对照：初版真实轨迹保留在 Git 提交 `3f6ef9477ece437a898d0043a28ab31e62d12449`。初版模型尝试保存备选，被 `CONFIRMATION_REQUIRED` 拒绝；最终版没有这一步。迭代中间版曾在查询失败后尝试备选查询，收紧查询权限后由最终版的评测断言检查是否还会发生。这些是小样本回归，不能推断模型长期稳定性。
+| 场景 | 输入与执行条件 | 实际输出 | 验证记录 |
+|---|---|---|---|
+| 备选也被占用 | 原始请求加 `--schedule data/occupied-next.json` | [建议 20:00](../examples/mock/occupied-alternative.output.json) | [Trace](../examples/mock/occupied-alternative.trace.jsonl) · [数据库快照](../examples/mock/occupied-alternative.db.json) |
+| 无可用备选 | 原始请求加 `--schedule data/occupied-all.json` | [NO_ALTERNATIVE_SLOT](../examples/mock/no-alternative.output.json) | [Trace](../examples/mock/no-alternative.trace.jsonl) · [数据库快照](../examples/mock/no-alternative.db.json) |
+| 确认前被抢占 | 生成提案后追加已有占用，再确认 | [SLOT_TAKEN，草稿为零](../examples/mock/stale-confirmation.output.json) | [Trace](../examples/mock/stale-confirmation.trace.jsonl) · [数据库快照](../examples/mock/stale-confirmation.db.json) |
 
-## 双版本重复对照
+## Harness 与预算
 
-2026-11-10，用同一 DeepSeek Flash 配置对初版（`3f6ef947`）和增强版分别执行 5 组。每组运行两次：相同的请求、素材、规则与模型，仅切换 18:00 的占用；每次运行使用全新的 SQLite 文件。比较脚本核对两版使用的合成材料，并记录运行代码的摘要。共 20 次真实场景运行，见[汇总](../examples/trajectory-eval/summary.json)和[逐次原始证据](../examples/trajectory-eval/runs.jsonl)。
+每次工具调用同时核对本轮最初开放的权限和执行前仍有效的权限。首次保存成功或失败后，同一回复中的第二次保存被拒绝，测试确认存储层只执行一次。真实模型的两条路径中保留了治理字段。[治理运行汇总](../examples/harness-smoke/summary.json) · [真实调用记录](../examples/harness-smoke/runs.jsonl)
 
-| 指标 | 初版 | 增强版 |
-|---|---:|---:|
-| 两条路径都完成的组数 | 4 / 5 | 5 / 5 |
-| 空闲：正确动作 / 业务成功 | 5 / 5；5 / 5 | 5 / 5；5 / 5 |
-| 冲突：正确补查 / 业务成功 | 5 / 5；4 / 5 | 5 / 5；5 / 5 |
-| 冲突中的保存调用次数 | 0 | 0 |
-| 最终输出格式失败次数 | 1 | 0 |
+预算测试覆盖模型回合和工具调用上限。预算耗尽时，运行状态为 `incomplete`，停止原因为 `BUDGET_EXHAUSTED`。已提交的草稿保留保存状态和草稿 ID。写入失败时保留 `WRITE_FAILED`。重复提交会复用已保存草稿。
 
-初版第 2 组冲突运行在看到占用后正确补查，也查到了候选，但最后未通过结构化输出检查（`INVALID_FINAL_RESPONSE`），没有生成可用建议或草稿。因此动作得分通过，业务验收失败。增强版这批运行均返回有效结果。历史上[初版曾尝试保存备选](../examples/trajectory-eval/baseline-original-conflict.trace.jsonl)，本轮重复对照中两版都没有出现该行为；不能把那次历史样本与本轮混算，也不能据此断言工具调用减少。两版同时存在工具权限和提示词等差异，少量同场景样本不能证明某个单独改动导致通过率变化。
+其他自动测试覆盖素材规则变化、确认写入回滚、伪造调用、批次部分成功、时区校验和模型断开时保留回执。协议适配测试使用注入响应。
 
-动作断言要求模型在收到占用结果后的另一个回合发起备选查询；业务断言核对输出中的时段、确认状态、草稿 ID 与 SQLite 实际行。仅计算模型发起的工具调用，不把应用层生成提案计入，也不把一次被拒绝的保存等同于一次实际写入。
+## 复现与限制
 
-## 工具权限治理验证
+`npm test` 运行自动测试。`npm run demo` 运行全部 11 个离线场景，新记录默认写入 `.local/demo/mock/`。`npm run demo -- --mode live` 运行 8 个真实模式场景，新记录写入 `.local/demo/live/`。使用 `--out DIR` 可显式指定留存位置。
 
-同一回复包含两次保存的回归测试覆盖首次成功、首次写入失败两种情况。两种情况下都只调用一次存储层。第二次调用的 Trace 保留本轮最初开放的保存工具，并记录执行前权限已撤销。真实 DeepSeek 的空闲和冲突场景均通过，逐步证据包含治理字段。[运行汇总](../examples/harness-smoke/summary.json) · [真实轨迹](../examples/harness-smoke/runs.jsonl)
+轨迹评测检查动作是否发生在相应观察之后，业务评测核对输出与 SQLite 行。样例覆盖的是离散时段和合成规则，备选范围为同日向后 1–3 小时。真实模型记录的场景和重复次数有限。

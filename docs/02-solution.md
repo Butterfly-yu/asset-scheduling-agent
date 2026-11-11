@@ -1,6 +1,6 @@
 # 方案与取舍
 
-`cli.ts` 校验请求和素材、规则、占用文件。`agent.ts` 逐项执行有界循环。`model.ts` 处理 DeepSeek Chat Completions 与离线 Mock。`tools.ts` 定义四种工具和可见条件。`domain.ts` 处理时间、规则和数据校验。`store.ts` 负责 SQLite。`confirmation.ts` 是人触发的后续流程。
+`cli.ts` 校验请求和素材、规则、占用文件。`agent.ts` 逐项执行有界循环。`model.ts` 处理 DeepSeek Chat Completions 与离线 Mock。`tools.ts` 定义四种工具和可见条件。`harness.ts` 核对回合开始和实际执行前的工具权限。`domain.ts` 处理时间、规则和数据校验。`store.ts` 负责 SQLite。`confirmation.ts` 是人触发的后续流程。
 
 真实模式由模型返回工具调用，程序把调用及对应 `tool_call_id` 的结果放回消息列表。模型根据事实选择查询、保存或结束。工具授权随可信状态收紧：素材读取后才可审核、审核通过才可查时段、原时段查到空闲后才提供草稿保存。每轮开始时记录提供给模型的工具权限，每次调用前再根据最新业务状态判断权限是否仍有效。模型在一个回复里提交两次保存时，首次保存的结果会撤销第二次调用的写入权限。Trace 的 governance 字段记录本轮提供的工具、执行前仍可用的工具、放行或拒绝原因以及剩余调用预算。保存入口独立核验原始时段和审核，并在事务内重查占用。每项最多 8 个模型回合、10 次工具调用尝试，默认 35 秒。回合或工具调用预算耗尽时，该素材的运行状态为 `incomplete`，`stopReason` 为 `BUDGET_EXHAUSTED`。已提交的草稿保留其保存状态和回执，重复提交时复用。批次中已有其他项完成时，请求状态为 `partial`。Trace 中的依据来自工具事实，不是模型内部推理。
 
