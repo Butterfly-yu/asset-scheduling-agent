@@ -134,6 +134,40 @@ test('同一模型回合批量请求也无法突破工具预算',async t=>{
   assert.equal(db.drafts().length,0);
 });
 
+test('最后一次调用保存成功但运行预算耗尽，输出保留真实草稿回执',async t=>{
+  for(const limit of [{maxCalls:4},{maxTurns:4}]){
+    const db=memory(t);
+    const output=await run(db,req,limit);
+    const item=output.items[0];
+    assert.equal(output.status,'incomplete');
+    assert.equal(item.status,'incomplete');
+    assert.equal(item.reason,'BUDGET_EXHAUSTED');
+    assert.equal(item.stopReason,'BUDGET_EXHAUSTED');
+    assert.equal(item.saveStatus,'saved');
+    assert.equal(item.scheduleStatus,'scheduled');
+    assert.equal(item.draftId,db.drafts()[0].draftId);
+    assert.equal(output.trace.at(-1)?.nextAction,'stop:BUDGET_EXHAUSTED');
+    const replay=await run(db,req,limit);
+    assert.equal(replay.status,'completed');
+    assert.equal(replay.items[0].saveStatus,'replayed');
+    assert.equal(replay.items[0].draftId,item.draftId);
+    assert.equal(db.drafts().length,1);
+  }
+});
+
+test('预算耗尽时保留实际写入失败的原因',async t=>{
+  const db=memory(t);
+  const output=await run(db,req,{maxCalls:4,failSave:true});
+  const item=output.items[0];
+  assert.equal(output.status,'incomplete');
+  assert.equal(item.status,'incomplete');
+  assert.equal(item.reason,'WRITE_FAILED');
+  assert.equal(item.stopReason,'BUDGET_EXHAUSTED');
+  assert.equal(item.saveStatus,'failed');
+  assert.equal(item.draftId,null);
+  assert.equal(db.drafts().length,0);
+});
+
 test('已提交草稿保留，即使模型在下一回合断开',async t=>{
   const db=memory(t);
   const decide:Decide=async(h,s)=>{

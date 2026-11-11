@@ -154,9 +154,18 @@ export function createTools(store: Store, data: Data, requestId: string, item: I
       } else if (candidate != null) reason='INVALID_SUGGESTION';
       else reason=alternativesChecked && !available.length?'NO_ALTERNATIVE_SLOT':'NO_CONFIRMED_SLOT';
     } else reason='NO_VERIFIED_OUTCOME';
+
+    // A committed draft and a completed Agent run are separate outcomes.
+    if (stopReason === 'BUDGET_EXHAUSTED') {
+      status = 'incomplete';
+      reason ??= stopReason;
+    }
+    const nextStep = draft && stopReason === 'BUDGET_EXHAUSTED'
+      ? '草稿已提交。用同一请求重试会复用该草稿。'
+      : reason ? next[reason] ?? '请查看 Trace 并重试。' : null;
     return {
       assetId:item.assetId, channel:item.channel, requiredTime:item.requiredTime,
-      status, reason, stopReason:stopReason ?? null, nextStep:reason ? next[reason] ?? '请查看 Trace 并重试。' : null,
+      status, reason, stopReason:stopReason ?? null, nextStep,
       reviewStatus:review?.status ?? (loaded && !asset?'missing_info':'unknown'),
       ruleVersion:review?.version ?? null, risks:review?.risks ?? [],
       missing:review?.missing ?? (loaded && !asset?['asset']:[]),

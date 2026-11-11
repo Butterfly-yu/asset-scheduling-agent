@@ -1,22 +1,22 @@
 # 评估记录
 
-在 Node.js v26.13.0 下执行了 29 项自动测试和 11 个离线演示场景，均通过。见 [自动测试日志](../examples/test-results.txt)、[离线汇总](../examples/mock/summary.json)。脚本为每个场景留存 `*.output.json`、`*.trace.jsonl` 和 `*.db.json`。离线记录来自实际执行，不能证明真实模型决策。
+在 Node.js v26.13.0 下执行了 31 项自动测试和 11 个离线演示场景，均通过。见 [自动测试日志](../examples/test-results.txt)、[离线汇总](../examples/mock/summary.json)。脚本为每个场景留存 `*.output.json`、`*.trace.jsonl` 和 `*.db.json`。离线记录来自实际执行，不能证明真实模型决策。
 
-| 场景 | 输入或条件 | 离线结果 |
-|---|---|---|
-| 正常 | [原始请求](../examples/paired.input.json)，18:00 空闲 | [一条草稿](../examples/mock/available.output.json) |
-| 时段冲突 | 同一请求，仅切换 [已有占用](../data/occupied.json) | [19:00 待确认，草稿为零](../examples/mock/conflict.output.json) |
-| 缺资料 | [缺授权字段](../examples/missing.input.json) | [列出待补项](../examples/mock/missing.output.json) |
-| 规则风险 | [无使用授权](../examples/risk.input.json) | [明确阻断](../examples/mock/risk.output.json) |
-| 重复提交 | 同一请求、同一个库 | [复用原 ID](../examples/mock/replay.output.json) |
-| 保存失败 | 插入后、提交前注入失败 | [WRITE_FAILED，无草稿](../examples/mock/write-failure.output.json) |
-| 时段查询失败 | 注入原时段查询失败 | [SLOT_QUERY_FAILED，注明作用域](../examples/mock/query-failure.output.json) |
-| 备选时段变化 | [18:00 和 19:00 均占用](../data/occupied-next.json) | [改建议 20:00](../examples/mock/occupied-alternative.output.json) |
-| 无备选 | [搜索窗口已占满](../data/occupied-all.json) | [NO_ALTERNATIVE_SLOT](../examples/mock/no-alternative.output.json) |
-| 确认与重放 | 同一个库中人工确认同一提案两次 | [19:00 已存，保留 18:00 原要求](../examples/mock/confirmation.output.json) |
-| 确认时被抢占 | 生成提案后再写入 [19:00 占用](../data/occupied-next.json) | [SLOT_TAKEN，草稿为零](../examples/mock/stale-confirmation.output.json) |
+| 场景 | 输入与执行条件 | 实际离线结果 | 运行记录 |
+|---|---|---|---|
+| 正常 | [原始请求](../examples/paired.input.json)，18:00 空闲 | [一条草稿](../examples/mock/available.output.json) | [Trace](../examples/mock/available.trace.jsonl) · [数据库快照](../examples/mock/available.db.json) |
+| 时段冲突 | [原始请求](../examples/paired.input.json)，`--scenario occupied` 加载 [已有占用](../data/occupied.json) | [19:00 待确认，草稿为零](../examples/mock/conflict.output.json) | [Trace](../examples/mock/conflict.trace.jsonl) · [数据库快照](../examples/mock/conflict.db.json) |
+| 缺资料 | [缺授权字段的请求](../examples/missing.input.json) | [列出待补项](../examples/mock/missing.output.json) | [Trace](../examples/mock/missing.trace.jsonl) · [数据库快照](../examples/mock/missing.db.json) |
+| 规则风险 | [无使用授权的请求](../examples/risk.input.json) | [明确阻断](../examples/mock/risk.output.json) | [Trace](../examples/mock/risk.trace.jsonl) · [数据库快照](../examples/mock/risk.db.json) |
+| 重复提交 | [原始请求](../examples/paired.input.json)，同一 `--db` 连续提交两次 | [复用原 ID](../examples/mock/replay.output.json) | [Trace](../examples/mock/replay.trace.jsonl) · [数据库快照](../examples/mock/replay.db.json) |
+| 保存失败 | [原始请求](../examples/paired.input.json) 加 `--fail-save`，插入后、提交前注入失败 | [WRITE_FAILED，无草稿](../examples/mock/write-failure.output.json) | [Trace](../examples/mock/write-failure.trace.jsonl) · [数据库快照](../examples/mock/write-failure.db.json) |
+| 时段查询失败 | [原始请求](../examples/paired.input.json) 加 `--fail-query requested` | [SLOT_QUERY_FAILED，注明作用域](../examples/mock/query-failure.output.json) | [Trace](../examples/mock/query-failure.trace.jsonl) · [数据库快照](../examples/mock/query-failure.db.json) |
+| 备选时段变化 | [原始请求](../examples/paired.input.json) 加 `--schedule data/occupied-next.json` | [改建议 20:00](../examples/mock/occupied-alternative.output.json) | [Trace](../examples/mock/occupied-alternative.trace.jsonl) · [数据库快照](../examples/mock/occupied-alternative.db.json) |
+| 无备选 | [原始请求](../examples/paired.input.json) 加 `--schedule data/occupied-all.json` | [NO_ALTERNATIVE_SLOT](../examples/mock/no-alternative.output.json) | [Trace](../examples/mock/no-alternative.trace.jsonl) · [数据库快照](../examples/mock/no-alternative.db.json) |
+| 确认与重放 | 对时段冲突生成的提案，用同一 `--db` 和 `--proposal` 确认两次 | [19:00 已存，保留 18:00 原要求](../examples/mock/confirmation.output.json) | [Trace](../examples/mock/confirmation.trace.jsonl) · [数据库快照](../examples/mock/confirmation.db.json) |
+| 确认时被抢占 | 生成提案后，用 `--schedule data/occupied-next.json` 载入 [19:00 占用](../data/occupied-next.json) 再确认 | [SLOT_TAKEN，草稿为零](../examples/mock/stale-confirmation.output.json) | [Trace](../examples/mock/stale-confirmation.trace.jsonl) · [数据库快照](../examples/mock/stale-confirmation.db.json) |
 
-额外单测覆盖：确认前素材授权变化、确认写入回滚、伪造调用、同一回合夹带后续动作、执行预算耗尽、模型断开时保留已提交结果、批次部分成功和时区校验。协议适配测试使用注入响应，不调用远端。
+额外单测覆盖：确认前素材授权变化、确认写入回滚、伪造调用、同一回合夹带后续动作、执行预算耗尽、模型断开时保留已提交结果、批次部分成功和时区校验。协议适配测试使用注入响应，不调用远端。预算边界测试覆盖模型回合和工具调用上限。最后一次允许的保存已经提交时，运行状态为 `incomplete`，停止原因为 `BUDGET_EXHAUSTED`，同时保留 `saveStatus: saved` 和草稿 ID。同一请求重试时复用该草稿。最后一次保存失败时，输出同时保留 `WRITE_FAILED` 与预算停止原因。
 
 2026-11-10 使用 DeepSeek 官方 API（`deepseek-flash`、关闭深度思考）运行最终版。见 [真实模式汇总](../examples/live/summary.json)。8 个场景通过：6 个实际调用模型，重放和显式确认由程序独立执行。
 
