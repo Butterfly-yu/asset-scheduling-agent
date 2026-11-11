@@ -1,4 +1,5 @@
 import { createTools } from './tools.ts';
+import { authorizeToolCall, captureToolGrants } from './harness.ts';
 import type { Data, ToolResult } from './tools.ts';
 import type { Decide, Message } from './model.ts';
 import type { Request } from './domain.ts';
@@ -6,7 +7,7 @@ import { Store } from './store.ts';
 
 export type Mode = 'mock' | 'live';
 export type Trace = {assetId:string; mode:Mode; step:number; turn:number; action:string;
-  args:Record<string,unknown>; result:ToolResult; nextAction?:string; basis?:string};
+  args:Record<string,unknown>; result:ToolResult; nextAction?:string; basis?:string; governance?:ReturnType<typeof authorizeToolCall>};
 export type Options = {mode:Mode; decide:Decide; model?:string; failSave?:boolean; maxTurns?:number; maxCalls?:number;
   timeoutMs?:number; failQuery?:'requested'|'alternatives'};
 
@@ -62,9 +63,7 @@ export async function runRequest(store:Store, data:Data, req:Request, options:Op
       if (signal.aborted) { stopReason='MODEL_TIMEOUT'; break; }
       let reply;
       const offered = bound.availableTools();
-      const allowed = new Set<string>(offered.map(t=>t.function.name));
-      const queryParameters = offered.find(t=>t.function.name==='query_slots')?.function.parameters.properties as {scope?:{enum:string[]}}|undefined;
-      const queryScopes = queryParameters?.scope?.enum ?? [];
+      const offeredGrants = captureToolGrants(offered);
       try { reply = await options.decide(history,signal,offered); }
       catch (error) {
         const code = error instanceof Error ? error.message : '';
@@ -93,13 +92,16 @@ export async function runRequest(store:Store, data:Data, req:Request, options:Op
           if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('bad args');
           args = parsed;
         } catch { valid = false; }
-        const allowedScope = call.function.name!=='query_slots' || typeof args.scope!=='string' || queryScopes.includes(args.scope);
-        try { result = !valid ? {code:'INVALID_TOOL_OR_ARGUMENTS'} : !allowed.has(call.function.name) || !allowedScope
-          ? {code:'TOOL_NOT_AVAILABLE'} : bound.run(call.function.name,args); }
-        catch { result = {code:'TOOL_ERROR'}; }
+        const governance = authorizeToolCall(offeredGrants,captureToolGrants(bound.availableTools()),
+          call.function.name,valid ? args : null,maxCalls-calls);
+        try {
+          result = governance.decision==='allowed'
+            ? bound.run(call.function.name,args)
+            : {code:valid?'TOOL_NOT_AVAILABLE':'INVALID_TOOL_OR_ARGUMENTS', reason:governance.reason};
+        } catch { result = {code:'TOOL_ERROR'}; }
         const action = /^[a-z_]{1,40}$/.test(call.function.name) ? call.function.name : 'invalid_tool';
         local.push({assetId:item.assetId,mode:options.mode,step:calls,turn,action,
-          args:safeArgs(action,args),result,basis:basis[result.code] ?? '依据见本步工具返回'});
+          args:safeArgs(action,args),result,governance,basis:basis[result.code] ?? '依据见本步工具返回'});
         history.push({role:'tool',tool_call_id:call.id,content:JSON.stringify(result)});
       }
       if (signal.aborted) { stopReason='MODEL_TIMEOUT'; break; }

@@ -2,177 +2,183 @@ TAP version 13
 # Subtest: 同一请求：空闲时保存；仅改变占用后模型补查并等待确认
 ok 1 - 同一请求：空闲时保存；仅改变占用后模型补查并等待确认
   ---
-  duration_ms: 60.5296
+  duration_ms: 14.9148
   type: 'test'
   ...
 # Subtest: 资料缺失、未知素材和授权风险分别有可验证证据
 ok 2 - 资料缺失、未知素材和授权风险分别有可验证证据
   ---
-  duration_ms: 8.2045
+  duration_ms: 2.7362
   type: 'test'
   ...
 # Subtest: 不同进程生命周期的连接重放同一草稿；相同 ID 更换请求被拒绝
 ok 3 - 不同进程生命周期的连接重放同一草稿；相同 ID 更换请求被拒绝
   ---
-  duration_ms: 167.6552
+  duration_ms: 48.802
   type: 'test'
   ...
 # Subtest: 提交前保存错误回滚；同 ID 修复后可以重试
 ok 4 - 提交前保存错误回滚；同 ID 修复后可以重试
   ---
-  duration_ms: 9.2446
+  duration_ms: 1.9376
   type: 'test'
   ...
 # Subtest: 模型尝试改期、自行声明授权或绕过审核均无法写入
 ok 5 - 模型尝试改期、自行声明授权或绕过审核均无法写入
   ---
-  duration_ms: 3.6186
+  duration_ms: 1.2633
   type: 'test'
   ...
 # Subtest: 查询后插入占用，事务复查阻止过期观察造成的冲突
 ok 6 - 查询后插入占用，事务复查阻止过期观察造成的冲突
   ---
-  duration_ms: 4.4105
+  duration_ms: 1.4563
   type: 'test'
   ...
 # Subtest: 不接受未经查询的备选时间或模型自行声称已保存
 ok 7 - 不接受未经查询的备选时间或模型自行声称已保存
   ---
-  duration_ms: 9.8481
+  duration_ms: 2.2738
   type: 'test'
   ...
 # Subtest: 同一模型回合批量请求也无法突破工具预算
 ok 8 - 同一模型回合批量请求也无法突破工具预算
   ---
-  duration_ms: 4.7401
+  duration_ms: 1.03
   type: 'test'
   ...
 # Subtest: 已提交草稿保留，即使模型在下一回合断开
 ok 9 - 已提交草稿保留，即使模型在下一回合断开
   ---
-  duration_ms: 4.889
+  duration_ms: 1.1607
   type: 'test'
   ...
 # Subtest: 批内同渠道同时段只保存一项；不吞掉已成功的结果
 ok 10 - 批内同渠道同时段只保存一项；不吞掉已成功的结果
   ---
-  duration_ms: 8.9729
+  duration_ms: 1.4711
   type: 'test'
   ...
 # Subtest: 时间验证排除缺少偏移量及不存在的日期
 ok 11 - 时间验证排除缺少偏移量及不存在的日期
   ---
-  duration_ms: 1.7523
+  duration_ms: 0.3017
   type: 'test'
   ...
 # Subtest: DeepSeek 适配器按协议回传 tool_call_id 和工具结果；此测试不访问真实模型
 ok 12 - DeepSeek 适配器按协议回传 tool_call_id 和工具结果；此测试不访问真实模型
   ---
-  duration_ms: 168.4254
+  duration_ms: 28.6011
   type: 'test'
   ...
 # Subtest: 模型错误不能凭空变成业务成功；配置和报错不回显密钥
 ok 13 - 模型错误不能凭空变成业务成功；配置和报错不回显密钥
   ---
-  duration_ms: 5.1645
+  duration_ms: 1.4341
   type: 'test'
   ...
 # Subtest: 排期查询失败进入最终结果；无时段写入、可重试
 ok 14 - 排期查询失败进入最终结果；无时段写入、可重试
   ---
-  duration_ms: 63.4941
+  duration_ms: 13.3603
   type: 'test'
   ...
 # Subtest: 写入失败后模型格式错误不会遮掉已知的保存失败
 ok 15 - 写入失败后模型格式错误不会遮掉已知的保存失败
   ---
-  duration_ms: 6.048
+  duration_ms: 1.666
   type: 'test'
   ...
 # Subtest: 冲突后不向模型提供保存工具，模型伪造调用也被运行层拒绝
 ok 16 - 冲突后不向模型提供保存工具，模型伪造调用也被运行层拒绝
   ---
-  duration_ms: 6.5001
+  duration_ms: 2.4959
   type: 'test'
   ...
 # Subtest: 同一模型回合不能在读取素材前夹带未授权的工具
 ok 17 - 同一模型回合不能在读取素材前夹带未授权的工具
   ---
-  duration_ms: 3.2446
+  duration_ms: 1.719
   type: 'test'
   ...
 # Subtest: 候选跟随实际占用；搜索范围无候选时明确返回原因
 ok 18 - 候选跟随实际占用；搜索范围无候选时明确返回原因
   ---
-  duration_ms: 16.0126
+  duration_ms: 2.6839
   type: 'test'
   ...
 # Subtest: 跨连接确认及重放：原始时段保留，确认同一提案只保存一次
 ok 19 - 跨连接确认及重放：原始时段保留，确认同一提案只保存一次
   ---
-  duration_ms: 241.2341
+  duration_ms: 68.8772
   type: 'test'
   ...
 # Subtest: 确认时重新检查占用，已被抢占的提案不写入；重查可生成新提案
 ok 20 - 确认时重新检查占用，已被抢占的提案不写入；重查可生成新提案
   ---
-  duration_ms: 10.279
+  duration_ms: 2.3312
   type: 'test'
   ...
 # Subtest: 确认时重新检查素材规则，风险或缺资料均阻止写入
 ok 21 - 确认时重新检查素材规则，风险或缺资料均阻止写入
   ---
-  duration_ms: 4.8816
+  duration_ms: 1.453
   type: 'test'
   ...
 # Subtest: 确认写入失败回滚且可重试；不存在的提案返回明确原因
 ok 22 - 确认写入失败回滚且可重试；不存在的提案返回明确原因
   ---
-  duration_ms: 13.0631
+  duration_ms: 2.2856
   type: 'test'
   ...
 # Subtest: 自定义数据拒绝错误类型和缺失的硬性授权规则
 ok 23 - 自定义数据拒绝错误类型和缺失的硬性授权规则
   ---
-  duration_ms: 5.9799
+  duration_ms: 0.4409
   type: 'test'
   ...
 # Subtest: 同一回合预先夹带备选查询不会跳过模型观察
 ok 24 - 同一回合预先夹带备选查询不会跳过模型观察
   ---
-  duration_ms: 7.3678
+  duration_ms: 1.2181
+  type: 'test'
+  ...
+# Subtest: 同一批次中的第二次保存会在首次成功或失败后撤销授权
+ok 25 - 同一批次中的第二次保存会在首次成功或失败后撤销授权
+  ---
+  duration_ms: 2.1282
   type: 'test'
   ...
 # Subtest: 冲突通过业务断言时，仍单独统计被拒绝的保存调用
-ok 25 - 冲突通过业务断言时，仍单独统计被拒绝的保存调用
+ok 26 - 冲突通过业务断言时，仍单独统计被拒绝的保存调用
   ---
-  duration_ms: 10.6387
+  duration_ms: 1.5845
   type: 'test'
   ...
 # Subtest: 判断动态决策时区分同一回合、下一回合和没有来源的候选
-ok 26 - 判断动态决策时区分同一回合、下一回合和没有来源的候选
+ok 27 - 判断动态决策时区分同一回合、下一回合和没有来源的候选
   ---
-  duration_ms: 1.2328
+  duration_ms: 0.263
   type: 'test'
   ...
 # Subtest: 正常排期必须有与输出匹配的数据库草稿，冲突场景不能有草稿
-ok 27 - 正常排期必须有与输出匹配的数据库草稿，冲突场景不能有草稿
+ok 28 - 正常排期必须有与输出匹配的数据库草稿，冲突场景不能有草稿
   ---
-  duration_ms: 1.0823
+  duration_ms: 0.2047
   type: 'test'
   ...
 # Subtest: 模型补查正确但最终输出格式失败，动作通过、业务不通过
-ok 28 - 模型补查正确但最终输出格式失败，动作通过、业务不通过
+ok 29 - 模型补查正确但最终输出格式失败，动作通过、业务不通过
   ---
-  duration_ms: 0.7387
+  duration_ms: 0.1884
   type: 'test'
   ...
-1..28
-# tests 28
+1..29
+# tests 29
 # suites 0
-# pass 28
+# pass 29
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1440.8988
+# duration_ms 344.3972

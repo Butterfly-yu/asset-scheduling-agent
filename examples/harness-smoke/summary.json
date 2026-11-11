@@ -1,0 +1,50 @@
+{
+  "mode": "live",
+  "model": "deepseek-flash",
+  "node": "v26.13.0",
+  "repeats": 1,
+  "fixture": {
+    "requestId": "pair-001",
+    "assetId": "M01",
+    "channel": "short-video",
+    "requiredTime": "2026-12-01T18:00:00+08:00",
+    "alternative": "2026-12-01T19:00:00+08:00"
+  },
+  "summary": [
+    {
+      "version": "current",
+      "runtimeSha256": "edad8aceb3682d29fb8c02004f976e324ce77ceca8ff34001e3425c50179c5c3",
+      "scenarios": [
+        {
+          "scene": "available",
+          "runs": 1,
+          "businessPass": 1,
+          "decisionPass": 1,
+          "cliErrors": 0,
+          "invalidFinalResponses": 0,
+          "runsWithUnnecessarySave": 0,
+          "unnecessarySaveCalls": 0,
+          "meanModelToolCalls": 4
+        },
+        {
+          "scene": "occupied",
+          "runs": 1,
+          "businessPass": 1,
+          "decisionPass": 1,
+          "cliErrors": 0,
+          "invalidFinalResponses": 0,
+          "runsWithUnnecessarySave": 0,
+          "unnecessarySaveCalls": 0,
+          "meanModelToolCalls": 4
+        }
+      ]
+    }
+  ],
+  "pairedPassing": [
+    {
+      "version": "current",
+      "runs": 1,
+      "passed": 1
+    }
+  ]
+}

@@ -88,6 +88,7 @@ test('同一模型回合不能在读取素材前夹带未授权的工具',async 
   };
   const r=await runRequest(db,data,req,{...options,decide});
   assert.equal(r.trace[1].result.code,'TOOL_NOT_AVAILABLE');
+  assert.equal(r.trace[1].governance?.reason,'NOT_GRANTED_AT_TURN_START');
   assert.equal(db.drafts().length,0);
 });
 
@@ -188,4 +189,34 @@ test('同一回合预先夹带备选查询不会跳过模型观察',async t=>{
   const candidates=r.trace.find(s=>s.result.code==='CANDIDATES_FOUND')!;
   assert.equal(refused.turn,observed.turn);
   assert.ok(candidates.turn>observed.turn);
+});
+
+test('同一批次中的第二次保存会在首次成功或失败后撤销授权',async t=>{
+  for(const firstFails of [false,true]){
+    const db=memory(t,[]);
+    const save=db.save.bind(db);
+    let writes=0;
+    db.save=(requestId,item,review)=>{
+      writes++;
+      return save(requestId,item,review,firstFails && writes===1);
+    };
+    const decide:Decide=async(h,s)=>{
+      if(h.at(-1)?.content?.includes('"AVAILABLE"')) return {text:null,calls:[
+        ...scriptedCall('save_draft',{time:time(18)},'save-1').calls,
+        ...scriptedCall('save_draft',{time:time(18)},'save-2').calls]};
+      if(h.at(-1)?.content?.includes('"TOOL_NOT_AVAILABLE"')) return {calls:[],text:'{"suggestedTime":null}'};
+      return mockModel(h,s);
+    };
+    const result=await runRequest(db,data,req,{...options,decide});
+    const saves=result.trace.filter(step=>step.action==='save_draft');
+    assert.equal(writes,1);
+    assert.equal(saves[0].result.code,firstFails?'WRITE_FAILED':'SAVED');
+    assert.equal(saves[0].governance?.decision,'allowed');
+    assert.equal(saves[1].result.code,'TOOL_NOT_AVAILABLE');
+    assert.equal(saves[1].governance?.reason,'GRANT_REVOKED');
+    assert.ok(saves[1].governance?.offeredTools.some(tool=>tool.name==='save_draft'));
+    assert.ok(!saves[1].governance?.currentTools.some(tool=>tool.name==='save_draft'));
+    assert.equal(result.items[0].status,firstFails?'incomplete':'saved');
+    assert.equal(db.drafts().length,firstFails?0:1);
+  }
 });
