@@ -57,12 +57,4 @@ SQLite 使用 `(channel, slot_utc)` 防止重复占用，使用 `(request_id, as
 | 本地 SQLite | 事务、唯一约束与跨进程重放适合单机交付。存储模型限定为离散时间点。 |
 | Mock 与真实模式共用工具 | Mock 复现状态和故障路径。真实模式的轨迹用于验证模型是否根据观察改变动作。 |
 
-### Pi Core 选型与排期 Harness
-
-选型阶段评估了 Pi Core 的工具执行循环和治理接口。Pi Core 提供执行前的 `beforeToolCall`、执行后的 `afterToolCall`，以及回合和工具执行事件。项目中的模型决策、工具执行和权限判断采用了类似的职责划分。 [Pi Core 官方文档](https://github.com/earendil-works/pi/tree/main/packages/agent)
-
-Pi Core 在本项目中用于选型参考。交付代码使用 TypeScript 和 Node 原生实现 Agent 循环与 Harness。当前任务由单个 Agent 调用四个固定业务工具，原生实现便于直接检查每次授权判定、业务失败码和停止原因，运行依赖也只需 Node.js。
-
-本项目把工具拦截与排期状态绑定。回合开始时记录发给模型的工具权限，执行前按最新状态复核权限。同一回复中的第一次保存成功或失败后，第二次保存都会在进入存储层前被拒绝。Trace 保留权限快照、拒绝原因和剩余预算，测试可验证第二次调用没有到达存储层。 [循环入口](../src/agent.ts) · [Harness 实现](../src/harness.ts) · [治理验证](03-evaluation.md#harness-与预算)
-
 排期读写分离、幂等参数绑定与轨迹断言采用了项目中列出的设计参考。 [Cal.com 排期](https://cal.com/docs/api-reference/v2/slots/get-available-time-slots-for-an-event-type) · [Stripe 幂等请求](https://docs.stripe.com/api/idempotent_requests) · [ADK 轨迹评测](https://codelabs.developers.google.com/adk-eval/instructions)
